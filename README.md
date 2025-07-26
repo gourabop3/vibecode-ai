@@ -76,4 +76,4 @@ Visit [http://localhost:3000](http://localhost:3000) in your browser.
 - **Sandbox/Preview not working?** Sandboxes are temporary. If expired, re-run the preview or use local setup.
 - **Still stuck?** Check logs for errors and share them for help.
 
-# Deployment trigger: minor change to force Render auto-deploy
+# Deployment trigger: minor change to force Vercel auto-deploy
