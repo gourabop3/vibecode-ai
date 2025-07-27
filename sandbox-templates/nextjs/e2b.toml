@@ -10,8 +10,8 @@
 # import { Sandbox } from 'e2b'
 # const sandbox = await Sandbox.create('vibe-2025')
 
-team_id = "76e7eb99-5424-464e-9317-87125271b30b"
+team_id = "fd79eae7-454b-4e06-b04d-d2459ba1d72b"
 start_cmd = "/compile_page.sh"
 dockerfile = "e2b.Dockerfile"
-template_name = "vibe-2025"
-template_id = "t6q82p6znq4of4o7yuqy"
+template_name = "vibegourab"
+template_id = "oerix5sdiqjkw41flspo"
