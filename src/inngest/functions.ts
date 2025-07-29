@@ -73,7 +73,7 @@ const codeAgent = createAgent<AgentState>({
             model: openai({
                 baseUrl: process.env.OPENROUTER_BASE_URL,
                 apiKey: process.env.OPENROUTER_API_KEY,
-                model: 'deepseek/deepseek-r1-0528-qwen3-8b:free',
+                model: 'deepseek/deepseek-r1-distill-qwen-14b:free',
             }),
 
             tools : [
