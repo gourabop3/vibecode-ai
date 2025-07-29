@@ -2,6 +2,7 @@ import * as z from "zod";
 import { inngest } from "./client";
 import { getSandbox, lastAssistantTextMessageContent } from "./utils";
 import {
+    openai,
     createAgent,
     createTool,
     createNetwork,
@@ -12,7 +13,7 @@ import {
 import { Sandbox } from "@e2b/code-interpreter";
 import { FRAGMENT_TITLE_PROMPT, PROMPT, RESPONSE_PROMPT } from "@/lib/prompt";
 import { prisma } from "@/lib/db";
-import OpenAI from "openai";
+
 
 // Configure OpenRouter client
 const openRouter = ({ model }: { model: string }) => ({
