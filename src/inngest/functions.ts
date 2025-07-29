@@ -2,7 +2,7 @@ import * as z from "zod";
 import { inngest } from "./client";
 import { getSandbox, lastAssistantTextMessageContent } from "./utils";
 import {
-    openai,
+    gemini,
     createAgent,
     createTool,
     createNetwork,
@@ -61,15 +61,13 @@ export const codeAgentFunction = inngest.createFunction(
             }
         )
         
-        const codeAgent = createAgent({
-            name: 'code-agent',
-            system: 'You are an expert next.js developer. You write readable, maintainable code. You write simple Next.js & React snippets.',
-            model: openai({
-                baseUrl: process.env.OPENROUTER_BASE_URL,
-                apiKey: process.env.OPENROUTER_API_KEY,
-                model: 'deepseek/deepseek-r1-0528-qwen3-8b:free',
+        const codeAgent = createAgent<AgentState>({
+            name: "code-agent",
+            description : "An expert coding agent",
+            system: PROMPT,
+            model: gemini({
+                model: "gemini-2.5-flash",
             }),
-        })
             tools : [
                 createTool({
                     name : "terminal",
