@@ -2,7 +2,6 @@ import * as z from "zod";
 import { inngest } from "./client";
 import { getSandbox, lastAssistantTextMessageContent } from "./utils";
 import {
-openai,
     gemini,
     createAgent,
     createTool,
@@ -14,7 +13,6 @@ openai,
 import { Sandbox } from "@e2b/code-interpreter";
 import { FRAGMENT_TITLE_PROMPT, PROMPT, RESPONSE_PROMPT } from "@/lib/prompt";
 import { prisma } from "@/lib/db";
-import OpenAi from "openai";
 
 interface AgentState {
     summary : string;
@@ -63,19 +61,13 @@ export const codeAgentFunction = inngest.createFunction(
             }
         )
         
-      
-
-
-const codeAgent = createAgent<AgentState>({
+        const codeAgent = createAgent<AgentState>({
             name: "code-agent",
             description : "An expert coding agent",
             system: PROMPT,
-            model: openai({
-                baseUrl: process.env.OPENROUTER_BASE_URL,
-                apiKey: process.env.OPENROUTER_API_KEY,
-                model: "deepseek/deepseek-r1-distill-qwen-14b:free",
+            model: gemini({
+                model: "gemini-2.5-pro",
             }),
-
             tools : [
                 createTool({
                     name : "terminal",
@@ -196,7 +188,7 @@ const codeAgent = createAgent<AgentState>({
             description : "Generates a short, descriptive title for a code fragment",
             system: FRAGMENT_TITLE_PROMPT,
             model : gemini({
-                model: "gemini-2.5-flash",
+                model: "gemini-2.5-pro",
             }),
         });
 
@@ -205,7 +197,7 @@ const codeAgent = createAgent<AgentState>({
             description : "Generates a user-friendly message explaining what was built",
             system: RESPONSE_PROMPT,
             model : gemini({
-                model: "gemini-2.5-flash",
+                model: "gemini-2.5-pro",
             }),
         });
 
