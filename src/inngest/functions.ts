@@ -69,7 +69,7 @@ export const codeAgentFunction = inngest.createFunction(
   baseUrl: process.env.OPENROUTER_BASE_URL!,
   apiKey: process.env.OPENROUTER_API_KEY!,
   model: "deepseek/deepseek-r1-0528-qwen3-8b:free", // or any DeepSeek model
-});
+})
             tools : [
                 createTool({
                     name : "terminal",
