@@ -2,7 +2,7 @@ import * as z from "zod";
 import { inngest } from "./client";
 import { getSandbox, lastAssistantTextMessageContent } from "./utils";
 import {
-openai
+openai,
     gemini,
     createAgent,
     createTool,
