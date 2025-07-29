@@ -62,25 +62,34 @@ export const codeAgentFunction = inngest.createFunction(
       model: modelProvider,
       tools: [
         createTool({
-          name: "terminal",
-          description: "Use the terminal to run shell commands.",
-          parameters: z.object({ command: z.string() }),
-          handler: async ({ command }, { step }) => {
-            return await step?.run("terminal", async () => {
-              const sandbox = await getSandbox(sandboxId);
-              const buffers = { stdout: "", stderr: "" };
-              try {
-                const result = await sandbox.commands.run(command, {
-                  onStdout: (d) => (buffers.stdout += d),
-                  onStderr: (d) => (buffers.stderr += d),
-                });
-                return result.stdout;
-              } catch (error) {
-                return `Command failed: ${error}\nstdout: ${buffers.stdout}\nstderr: ${buffers.stderr}`;
-              }
-            });
-          },
-        }),
+                    name : "terminal",
+                    description: "Use the terminal to run shell commands.",
+                    parameters : z.object({
+                        command : z.string()
+                    }),
+                    handler: async({ command }, { step }) => {
+                        return await step?.run("terminal", async()=>{
+                            const buffers = { stdout: "", stderr: "" };
+                            try {
+                                const sandbox = await getSandbox(sandboxId);
+                                const result = await sandbox.commands.run(command, {
+                                    onStdout: (data)=>{
+                                        buffers.stdout += data;
+                                    },
+                                    onStderr: (data)=>{
+                                        buffers.stderr += data;
+                                    }
+                                });
+                                return result.stdout
+                            } catch (error) {
+                                console.error(
+                                    `Command failed: ${error}\nstdout: ${buffers.stdout}\nstderr: ${buffers.stderr}`,
+                                );
+                                return `Command failed: ${error}\nstdout: ${buffers.stdout}\nstderr: ${buffers.stderr}`
+                            }
+                        })
+                    }
+                }),
         createTool({
           name: "createOrUpdateFiles",
           description: "Create or update files in the Sandbox.",
