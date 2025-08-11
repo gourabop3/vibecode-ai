@@ -1,6 +1,8 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { NextResponse } from 'next/server';
 
+export const runtime = 'nodejs';
+
 const apiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
 if (!apiKey) {
   throw new Error('GEMINI_API_KEY or GOOGLE_API_KEY is not set');
