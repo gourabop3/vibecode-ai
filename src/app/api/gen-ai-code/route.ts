@@ -1,9 +1,9 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { NextResponse } from 'next/server';
 
-const apiKey = process.env.GEMINI_API_KEY;
+const apiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
 if (!apiKey) {
-  throw new Error('GEMINI_API_KEY is not set');
+  throw new Error('GEMINI_API_KEY or GOOGLE_API_KEY is not set');
 }
 
 const genAI = new GoogleGenerativeAI(apiKey);
@@ -80,11 +80,22 @@ export async function POST(req: Request) {
     const parsedResponse = JSON.parse(response);
     
     return NextResponse.json(parsedResponse);
-  } catch (error) {
-    console.error('AI Code Generation Error:', error);
+  } catch (error: unknown) {
+    // Surface more helpful info for debugging (without exposing secrets)
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    const anyError = error as any;
+    const statusFromSdk = anyError?.status || anyError?.response?.status;
+
+    console.error('AI Code Generation Error:', {
+      message: errorMessage,
+      status: statusFromSdk,
+      // If provided by the SDK, include structured error data for debugging
+      errorData: anyError?.response?.data || anyError?.cause || null,
+    });
+
     return NextResponse.json(
-      { error: 'Failed to generate code' },
-      { status: 500 }
+      { error: 'Failed to generate code', details: errorMessage },
+      { status: typeof statusFromSdk === 'number' ? statusFromSdk : 500 }
     );
   }
 }
