@@ -2,7 +2,7 @@ import * as z from "zod";
 import { inngest } from "./client";
 import { getSandbox, lastAssistantTextMessageContent } from "./utils";
 import {
-    gemini,
+    openai,
     createAgent,
     createTool,
     createNetwork,
@@ -65,8 +65,8 @@ export const codeAgentFunction = inngest.createFunction(
             name: "code-agent",
             description : "An expert coding agent",
             system: PROMPT,
-            model: gemini({
-                model: "gemini-2.5-pro",
+            model: openai({
+                model: "gpt-4o",
             }),
             tools : [
                 createTool({
@@ -187,8 +187,8 @@ export const codeAgentFunction = inngest.createFunction(
             name : "fragment-title-generator",
             description : "Generates a short, descriptive title for a code fragment",
             system: FRAGMENT_TITLE_PROMPT,
-            model : gemini({
-                model: "gemini-2.5-pro",
+            model : openai({
+                model: "gpt-4o",
             }),
         });
 
@@ -196,8 +196,8 @@ export const codeAgentFunction = inngest.createFunction(
             name : "response-generator",
             description : "Generates a user-friendly message explaining what was built",
             system: RESPONSE_PROMPT,
-            model : gemini({
-                model: "gemini-2.5-pro",
+            model : openai({
+                model: "gpt-4o",
             }),
         });
 
@@ -258,18 +258,19 @@ export const codeAgentFunction = inngest.createFunction(
                         create : {
                             sandboxUrl,
                             title : generateFragmentTitle(),
-                            files : result.state.data.files || {},
                         }
                     }
                 }
             })
-        })
 
-        return {
-            url: sandboxUrl,
-            title : "Fragment",
-            files : result.state.data.files,
-            summary: result.state.data.summary
-        };
-    },
+            await prisma.message.create({
+                data : {
+                    projectId : event.data.projectId,
+                    content : result.state.data.summary,
+                    role : "ASSISTANT",
+                    type : "SUMMARY"
+                }
+            })
+        })
+    }
 );
