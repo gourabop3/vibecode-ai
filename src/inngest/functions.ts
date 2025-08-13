@@ -258,19 +258,13 @@ export const codeAgentFunction = inngest.createFunction(
                         create : {
                             sandboxUrl,
                             title : generateFragmentTitle(),
+                            files : result.state.data.files || {},
                         }
                     }
                 }
             })
 
-            await prisma.message.create({
-                data : {
-                    projectId : event.data.projectId,
-                    content : result.state.data.summary,
-                    role : "ASSISTANT",
-                    type : "SUMMARY"
-                }
-            })
+            
         })
     }
 );

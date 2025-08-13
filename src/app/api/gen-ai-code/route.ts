@@ -1,31 +1,7 @@
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import OpenAI from 'openai';
 import { NextResponse } from 'next/server';
 
 export const runtime = 'nodejs';
-
-const apiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
-if (!apiKey) {
-  throw new Error('GEMINI_API_KEY or GOOGLE_API_KEY is not set');
-}
-
-const genAI = new GoogleGenerativeAI(apiKey);
-
-const model = genAI.getGenerativeModel({
-  model: 'gemini-2.0-flash-exp',
-});
-
-const codeGenerationConfig = {
-  temperature: 1,
-  topP: 0.95,
-  topK: 40,
-  maxOutputTokens: 8192,
-  responseMimeType: 'application/json',
-};
-
-const codeSession = model.startChat({
-  generationConfig: codeGenerationConfig,
-  history: []
-});
 
 const CODE_GEN_PROMPT = `
 You are an expert Next.js developer. Based on the user's request, create a complete Next.js application.
@@ -74,16 +50,27 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Prompt is required' }, { status: 400 });
     }
 
+    const apiKey = process.env.OPENAI_API_KEY;
+    if (!apiKey) {
+      return NextResponse.json({ error: 'OPENAI_API_KEY is not set' }, { status: 500 });
+    }
+
+    const client = new OpenAI({ apiKey });
+
     const finalPrompt = prompt + '\n\n' + CODE_GEN_PROMPT;
-    const result = await codeSession.sendMessage(finalPrompt);
-    const response = result.response.text();
-    
-    // Parse the JSON response
-    const parsedResponse = JSON.parse(response);
-    
+
+    const response = await client.responses.create({
+      model: 'gpt-4o',
+      input: finalPrompt,
+      temperature: 1
+    });
+
+    const text = response.output_text;
+
+    const parsedResponse = JSON.parse(text);
+
     return NextResponse.json(parsedResponse);
   } catch (error: unknown) {
-    // Surface more helpful info for debugging (without exposing secrets)
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     const anyError = error as any;
     const statusFromSdk = anyError?.status || anyError?.response?.status;
@@ -91,7 +78,6 @@ export async function POST(req: Request) {
     console.error('AI Code Generation Error:', {
       message: errorMessage,
       status: statusFromSdk,
-      // If provided by the SDK, include structured error data for debugging
       errorData: anyError?.response?.data || anyError?.cause || null,
     });
 
